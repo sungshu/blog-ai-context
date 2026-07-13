@@ -1,13 +1,6 @@
 # sungshu 手札筆記本 Hugo Blog
-
 ## AI Context & Engineering Specification
-
 ![Project Status](https://img.shields.io/badge/status-Engineering%20Specification%20v1.1-blue)
-
-# sungshu 手札筆記本 Hugo Blog
-
-## AI Context & Engineering Specification
-
 > 本 Repository 是 **sungshu 手札筆記本** 部落格專案的 AI Context 與工程規格文件。
 > 用於讓 AI、協作者與未來維護者快速理解專案目的、架構設計、技術決策與開發規範。
 
