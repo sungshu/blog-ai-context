@@ -2,183 +2,264 @@
 
 ## AI Context & Engineering Specification
 
-本 Repository 用於保存 **sungshu 手札筆記本** 部落格專案的：
+![Project Status](https://img.shields.io/badge/status-Engineering%20Specification%20v1.1-blue)
 
-* 專案背景
-* 架構設計
-* 技術決策
-* GitHub Repository 規劃
-* Hugo 設定規範
-* CMS 工作流程
-* 部署流程
-* 長期維護規範
+本 Repository 是 **sungshu 手札筆記本** 部落格專案的 AI Context 與工程規格文件。
 
-本 Repository 的目的不是建立 Hugo 教學文件，而是讓 AI、協作者或未來維護者能快速理解整個系統設計。
+用途：
+
+* 提供 AI 助手完整專案背景
+* 提供協作者架構說明
+* 保存技術決策紀錄
+* 定義開發與維護規範
 
 ---
 
-# Project Context
+# 重要說明
 
-## 專案目標
+## 這不是 Hugo 教學專案
 
-建立一套私人化技術部落格平台。
+本專案不是單純建立一個 Hugo 靜態網站。
 
-使用體驗希望接近：
+真正目標：
 
-* Blogger
-* Pixnet
+> 建立一套私人化技術部落格平台，使用體驗接近 Blogger / Pixnet，但保留完整資料控制、版本管理、SEO 與長期維護能力。
 
-但保留：
+---
 
-* Git 版本管理
-* Markdown 文章格式
-* SEO 控制能力
+# Project Goal
+
+## 專案目的
+
+建立個人技術部落格平台：
+
+```
+Blogger / Pixnet 使用便利性
+
++
+
+Git 版本控制
+
++
+
+Hugo 靜態網站效能
+
++
+
+完整資料自主權
+```
+
+希望達成：
+
+* 後台文章管理
+* 草稿管理
+* 分類與標籤
+* SEO 控制
 * 自訂網站功能
-* 長期維護能力
+* 長期維護
 
 ---
 
-## 核心理念
+# Core Design Philosophy
 
-本專案希望達成：
+本專案核心理念：
+
+## 使用者不應該需要成為 Hugo 工程師才能寫文章
+
+文章流程應接近：
 
 ```
-簡單發文體驗
-+
-完整資料控制
-+
-工程化管理方式
+登入後台
+
+↓
+
+建立文章
+
+↓
+
+編輯內容
+
+↓
+
+儲存草稿
+
+↓
+
+發布
+
+↓
+
+網站更新
 ```
 
-使用者不需要直接操作 Git 或 Hugo，
-而是透過 CMS 後台完成文章管理。
+而不是：
+
+```
+VS Code
+
+↓
+
+Markdown
+
+↓
+
+Git Commit
+
+↓
+
+Hugo Build
+```
+
+Git 與 Hugo 是底層架構，不是使用者操作入口。
 
 ---
 
 # Technology Stack
 
-目前架構：
+目前技術架構：
 
-```
-Hugo
-+
-Stack Theme
-+
-Decap CMS
-+
-GitHub
-+
-GitHub Pages
-```
-
-主要用途：
-
-| 技術           | 用途               |
-| ------------ | ---------------- |
-| Hugo         | 靜態網站產生器          |
-| Stack Theme  | Blog UI / Layout |
-| Decap CMS    | 後台文章管理           |
-| GitHub       | 原始碼與版本控制         |
-| GitHub Pages | 公開網站部署           |
+| Component        | Technology            |
+| ---------------- | --------------------- |
+| Static Generator | Hugo                  |
+| Theme            | Stack Theme           |
+| CMS              | Decap CMS             |
+| Source Control   | GitHub                |
+| Hosting          | GitHub Pages          |
+| Authentication   | GitHub OAuth          |
+| Analytics        | GA4 / Umami (Planned) |
+| Comment System   | Waline (Planned)      |
 
 ---
 
-# Architecture Overview
+# System Architecture
 
-整體資料流程：
+完整資料流：
 
 ```
-              Writer
-                |
-                v
-        Decap CMS (/admin)
-                |
-                v
-        GitHub OAuth
-                |
-                v
-      blog-source (Private)
-                |
-                |
-          Hugo Build
-                |
-                v
-      sungshu.github.io
-             (Public)
-                |
-                v
-            Visitors
+                    Author
+
+                      |
+                      v
+
+              Decap CMS Admin
+
+              /admin
+
+                      |
+
+                      v
+
+              GitHub OAuth
+
+                      |
+
+                      v
+
+        blog-source (Private Repository)
+
+        - Hugo Source
+        - Markdown Content
+        - Drafts
+        - Theme
+        - Configuration
+
+                      |
+
+                      v
+
+              Hugo Build
+
+                      |
+
+                      v
+
+        sungshu.github.io
+
+        Public Website
+
+                      |
+
+                      v
+
+                  Visitors
 ```
 
 ---
 
-# Repository Design
+# GitHub Repository Design
 
 目前 Repository 分工：
 
-| Repository        | Purpose                                | Permission |
+| Repository        | Purpose                                | Visibility |
 | ----------------- | -------------------------------------- | ---------- |
 | sungshu.github.io | 公開網站輸出                                 | Public     |
-| blog-source       | Hugo Source / Content / CMS            | Private    |
-| blog              | Hugo Playground / 測試區                  | Public     |
-| blog-docs         | 詳細文件與維運紀錄                              | Private    |
+| blog-source       | Hugo 原始碼與內容                            | Private    |
+| blog              | Hugo Playground / 測試環境                 | Public     |
+| blog-docs         | 詳細技術文件                                 | Private    |
 | blog-ai-context   | AI Context / Engineering Specification | Public     |
 
 ---
 
-# Important Design Decisions
+# Important Architecture Decisions
 
-以下為不可隨意變更的架構決策。
-
-## Source 必須保持 Private
-
-原因：
-
-包含：
-
-* 草稿文章
-* 未發布內容
-* Hugo 設定
-* CMS 設定
-* Theme 修改
-
-不可將完整 source 直接公開。
+以下為已確認架構，不應任意修改。
 
 ---
 
-## Public Repository 只放網站輸出
+## 1. Source Repository 必須保持 Private
+
+`blog-source`
+
+包含：
+
+* 原始 Hugo 專案
+* Markdown 文章
+* 草稿
+* CMS 設定
+* Theme 修改
+* Site Configuration
+
+不可直接公開。
+
+---
+
+## 2. Public Repository 只提供網站
 
 `sungshu.github.io`
 
 用途：
 
 * GitHub Pages Hosting
-* 公開 HTML / CSS / JS
-* 訪客瀏覽
+* 公開 HTML
+* CSS
+* JavaScript
+* 靜態資源
 
 不是：
 
-* 原始文章庫
+* 原始碼庫
 * 草稿庫
-* CMS 資料庫
+* CMS Repository
 
 ---
 
-## Hugo 不是 CMS
+## 3. Hugo 不是 CMS
 
 Hugo 負責：
 
 ```
 Markdown
-        |
-        v
+
+↓
+
 Hugo Build
-        |
-        v
+
+↓
+
 HTML
 ```
 
-文章管理入口：
+文章管理：
 
 ```
 Decap CMS
@@ -186,9 +267,11 @@ Decap CMS
 
 ---
 
-## 不回 Blogger / Pixnet
+## 4. 不回 Blogger / Pixnet
 
-本專案目的就是建立自己的平台。
+本專案目的：
+
+建立自己的平台。
 
 不以：
 
@@ -196,11 +279,11 @@ Decap CMS
 * Pixnet
 * WordPress
 
-作為最終架構。
+作為最終方案。
 
 ---
 
-# Content Design
+# Content Structure
 
 文章來源：
 
@@ -208,14 +291,19 @@ Decap CMS
 content/posts/
 ```
 
-規劃：
+設計：
 
 ```
 posts/
+
  ├── 2026/
- │    ├── article-1.md
- │    └── article-2.md
+
+ │     ├── article-a.md
+
+ │     └── article-b.md
 ```
+
+---
 
 URL 設計：
 
@@ -223,43 +311,97 @@ URL 設計：
 /posts/2026/07/article-name/
 ```
 
-Source 結構與 URL 結構分離。
+Source Path 與 URL Path 分離。
+
+透過 Hugo permalink 控制。
 
 ---
 
-# CMS Workflow
+# CMS Design
 
-文章流程：
+使用：
+
+```
+Decap CMS
+```
+
+登入：
+
+```
+https://sungshu.github.io/admin/
+```
+
+流程：
+
+```
+User
+
+↓
+
+CMS Login
+
+↓
+
+GitHub OAuth
+
+↓
+
+Private Repository Access
+
+↓
+
+Create / Edit Content
+
+↓
+
+Commit
+
+↓
+
+Deploy
+```
+
+---
+
+# Development Workflow
+
+## CMS Workflow
 
 ```
 Create Article
 
         |
+
         v
 
 Draft
 
         |
+
         v
 
 Review
 
         |
+
         v
 
 Publish
 
         |
+
         v
 
 Git Commit
 
         |
+
         v
 
 Hugo Build
 
         |
+
         v
 
 GitHub Pages Deploy
@@ -267,102 +409,249 @@ GitHub Pages Deploy
 
 ---
 
-# Development Rules
+## Git Workflow
 
-## AI 工作原則
+適合：
+
+* Theme 修改
+* Hugo 設定
+* 高階調整
+
+流程：
+
+```
+Local Development
+
+↓
+
+Git Commit
+
+↓
+
+Push
+
+↓
+
+Build
+
+↓
+
+Deploy
+```
+
+---
+
+# Feature Roadmap
+
+## Phase 1 - Foundation
+
+完成：
+
+* Repository Design
+* Hugo Architecture
+* Theme Selection
+* CMS Planning
+
+---
+
+## Phase 2 - Publishing System
+
+目標：
+
+* Hugo Source 建立
+* Stack Theme 整合
+* Decap CMS
+* Deploy Pipeline
+
+---
+
+## Phase 3 - Blog Features
+
+規劃：
+
+* Search
+* Comment
+* Like
+* View Counter
+* RSS
+* Sitemap
+
+---
+
+## Phase 4 - Operation
+
+規劃：
+
+* GA4
+* Google Search Console
+* SEO Optimization
+* Advertisement
+* Reward System
+
+---
+
+# Reference Websites
+
+參考網站用途：
+
+研究：
+
+* UI Layout
+* Blog Features
+* User Experience
+* Plugin Integration
+
+注意：
+
+Reference Website 不代表一定導入。
+
+---
+
+# AI Working Rules
 
 任何 AI 參與本專案時：
 
-1. 先理解架構，再提出修改
-2. 不自行替換技術方案
-3. 不將 Private Source 改為 Public
-4. 不移除 CMS 設計
-5. 不改變核心 Repository 分工
+## 必須：
+
+1. 先理解架構，再提出修改。
+2. 保持 Repository 分工。
+3. 尊重已完成決策。
+4. 區分「已完成」與「規劃中」。
 
 ---
 
-# Recommended Reading Order
+## 禁止：
 
-新加入 AI 或協作者請依序閱讀：
+不要自行：
 
-## Phase 1 - Understand
-
-1. README.md
-2. 01-project-overview.md
-3. 02-architecture.md
-4. 03-github-repository-design.md
-
-## Phase 2 - Implementation
-
-5. 04-hugo-structure.md
-6. 05-cms-design.md
-7. 12-hugo-config-reference.md
-8. 13-cms-authentication.md
-9. 14-deployment-design.md
-
-## Phase 3 - Operation
-
-10. 15-content-workflow.md
-11. 16-maintenance-guide.md
+* 改成 WordPress
+* 改成 Blogger
+* 公開 Source Repository
+* 移除 Decap CMS
+* 將 Hugo 當 CMS
+* 合併 Public / Private Repository
 
 ---
 
-# Documentation Index
+# Document Structure
 
-| Document                       | Description   |
+完整文件：
+
+| File                           | Purpose       |
 | ------------------------------ | ------------- |
-| 01-project-overview.md         | 專案目的與背景       |
+| 01-project-overview.md         | 專案目的          |
 | 02-architecture.md             | 系統架構          |
-| 03-github-repository-design.md | Repository 規劃 |
-| 04-hugo-structure.md           | Hugo 目錄設計     |
-| 05-cms-design.md               | Decap CMS 設計  |
-| 06-content-url-design.md       | URL 規劃        |
-| 07-theme-customization.md      | Theme 客製化     |
-| 08-feature-roadmap.md          | 功能 Roadmap    |
+| 03-github-repository-design.md | Repository 設計 |
+| 04-hugo-structure.md           | Hugo 結構       |
+| 05-cms-design.md               | CMS 設計        |
+| 06-content-url-design.md       | URL 設計        |
+| 07-theme-customization.md      | Theme 修改      |
+| 08-feature-roadmap.md          | 功能規劃          |
 | 09-reference-websites.md       | 參考網站          |
-| 10-ai-handover.md              | AI 交接說明       |
+| 10-ai-handover.md              | AI 交接         |
 | 11-content-frontmatter.md      | 文章格式規範        |
-| 12-hugo-config-reference.md    | Hugo 設定規範     |
-| 13-cms-authentication.md       | CMS 認證流程      |
+| 12-hugo-config-reference.md    | Hugo 設定       |
+| 13-cms-authentication.md       | CMS 認證        |
 | 14-deployment-design.md        | 部署設計          |
 | 15-content-workflow.md         | 文章流程          |
 | 16-maintenance-guide.md        | 維護指南          |
 
 ---
 
+# Recommended Reading Order
+
+## New AI / New Developer
+
+請依序閱讀：
+
+```
+README.md
+
+↓
+
+01-project-overview.md
+
+↓
+
+02-architecture.md
+
+↓
+
+03-github-repository-design.md
+
+↓
+
+05-cms-design.md
+
+↓
+
+10-ai-handover.md
+
+↓
+
+13-cms-authentication.md
+
+↓
+
+14-deployment-design.md
+
+↓
+
+15-content-workflow.md
+```
+
+---
+
 # Current Status
 
-目前階段：
+目前狀態：
 
 ```
 Architecture Design
-        |
-        v
+
+        ✅
+
 Engineering Specification v1.1
-        |
-        v
-Implementation Phase
+
+        ✅
+
+Implementation
+
+        ⏳
 ```
+
+---
+
+# Next Development Stage
 
 下一階段：
 
-* 建立 blog-source
-* 完成 Hugo 基礎架構
-* 整合 Stack Theme
-* 建立 Decap CMS
-* 建立 Deployment Pipeline
-* 完成網站功能開發
+1. 建立 blog-source
+2. 建立 Hugo 基礎架構
+3. 整合 Stack Theme
+4. 建立 Decap CMS
+5. 建立 GitHub Actions
+6. 完成網站部署
+7. 逐步加入 Blog 功能
 
 ---
 
 # Version
 
-Current Version:
+Current:
 
 ```
 v1.1 Engineering Specification
 ```
 
-Last Update:
+Project:
 
-2026
+```
+sungshu 手札筆記本
+```
+
+Purpose:
+
+```
+Private Technical Blog Platform
+```
